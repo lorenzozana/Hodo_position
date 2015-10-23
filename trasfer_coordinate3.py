@@ -23,47 +23,44 @@ except:
     sys.exit(1)
     pass
 
-output_tree = TTree("Physics", "Physics")
-print "Setup complete \nOpened file " + str(sys.argv[1]) + "  \nConverting to .root format and outputing to " + output_file_name
 
-
-pixels = i.load(input_file) # this is not a list
+i = Image.open(input_file)
+pixels = i.load() # this is not a list
 output_tree = TTree("Physics", "Physics")
-print "Setup complete \nOpened picture " + str(sys.argv[1]) + "  \nConverting to .root format and outputing to " + output_file_name
+print "Setup complete \nOpened picture " + input_file + "  \nConverting to .root format and outputing to " + output_file_name
 
 
 # Setup output branches
-X_v = r.vector('Double_t')()
-Y_v = r.vector('Double_t')()
-Pixel_v =r.vector('Double_t')()
+#X_v = r.vector('Double_t')()
+#Y_v = r.vector('Double_t')()
+#Pixel_v =r.vector('Double_t')()
 
 # Create a struct which acts as the TBranch for non-vectors
-gROOT.ProcessLine( "struct MyStruct{ Int_t n_particles; Double_t weight; };")
+gROOT.ProcessLine( "struct MyStruct{ Double_t X_v; Double_t Y_v; Double_t Pixel_v; };")
 from ROOT import MyStruct
 
 # Assign the variables to the struct
 s = MyStruct() 
-output_tree.Branch("X",X_v)
-output_tree.Branch("Y",Y_v)
-output_tree.Branch("Pixel",Pixel_v)
+output_tree.Branch('X_v',AddressOf(s,'X_v'),'X_v/D')
+output_tree.Branch('Y_v',AddressOf(s,'Y_v'),'Y_v/D')
+output_tree.Branch('Pixel_v',AddressOf(s,'Pixel_v'),'Pixel_v/D')
+
+#output_tree.Branch("X",X_v)
+#output_tree.Branch("Y",Y_v)
+#output_tree.Branch("Pixel",Pixel_v)
 
 width, height = i.size
-row_averages = []
 for y in range(height):
     cur_row_ttl = 0
     for x in range(width):
         cur_pixel = pixels[x, y]
         cur_pixel_mono = sum(cur_pixel) / len(cur_pixel)
         cur_row_ttl += cur_pixel_mono
-        X_v = x
-        Y_v = y
-        Pixel_v = 255 - cur_pixel_mono
+        s.X_v = x
+        s.Y_v = y
+        s.Pixel_v = 255 - cur_pixel_mono
         output_tree.Fill()
-        print "x=", x, " y=", y, " pixel=", cur_pixel_mono 
-    cur_row_avg = cur_row_ttl / width
-    row_averages.append(cur_row_avg)
-        
-print "Brighest row:",
-print max(row_averages)
+#        print "x=", x, " y=", y, " pixel=", cur_pixel_mono 
+
 output_tree.Write()
 output_file.Close()
