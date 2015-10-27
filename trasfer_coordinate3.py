@@ -1,6 +1,6 @@
 import os, sys, math
 import ROOT as r
-from ROOT import TTree, TFile, AddressOf, gROOT
+from ROOT import TTree, TFile, AddressOf, gROOT, TH2F
 
 from PIL import Image
 
@@ -27,6 +27,7 @@ except:
 i = Image.open(input_file)
 pixels = i.load() # this is not a list
 output_tree = TTree("Physics", "Physics")
+output_th2f = TH2F("histo_2d","Pixel ditribution; x(px) ; y(px) ",1165,0,1165,1645,0,1645) 
 print "Setup complete \nOpened picture " + input_file + "  \nConverting to .root format and outputing to " + output_file_name
 
 
@@ -60,7 +61,9 @@ for y in range(height):
         s.Y_v = y
         s.Pixel_v = 255 - cur_pixel_mono
         output_tree.Fill()
+        output_th2f.Fill(x,y,255 - cur_pixel_mono)
 #        print "x=", x, " y=", y, " pixel=", cur_pixel_mono 
 
 output_tree.Write()
+output_th2f.Write()
 output_file.Close()
