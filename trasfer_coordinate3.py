@@ -31,10 +31,6 @@ output_th2f = TH2F("histo_2d","Pixel ditribution; x(px) ; y(px) ",1165,0,1165,16
 print "Setup complete \nOpened picture " + input_file + "  \nConverting to .root format and outputing to " + output_file_name
 
 
-# Setup output branches
-#X_v = r.vector('Double_t')()
-#Y_v = r.vector('Double_t')()
-#Pixel_v =r.vector('Double_t')()
 
 # Create a struct which acts as the TBranch for non-vectors
 gROOT.ProcessLine( "struct MyStruct{ Double_t X_v; Double_t Y_v; Double_t Pixel_v; };")
@@ -46,9 +42,6 @@ output_tree.Branch('X_v',AddressOf(s,'X_v'),'X_v/D')
 output_tree.Branch('Y_v',AddressOf(s,'Y_v'),'Y_v/D')
 output_tree.Branch('Pixel_v',AddressOf(s,'Pixel_v'),'Pixel_v/D')
 
-#output_tree.Branch("X",X_v)
-#output_tree.Branch("Y",Y_v)
-#output_tree.Branch("Pixel",Pixel_v)
 
 width, height = i.size
 for y in range(height):
